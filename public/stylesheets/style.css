@@ -1,0 +1,76 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+#map {
+  margin-top: 5%;
+  height: 400px;
+  width: 100%;
+
+}
+#map1 {
+  height: 200px;
+  width: 100%;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#kv {
+  position: absolute;
+  top: 15%;
+  background-color: blueviolet;
+  height: 100px;
+  width: 30%;
+}
+
+#kv1 {
+  position: absolute;
+  top: 15%;
+  left: 32%;
+  background-color: indianred;
+  height: 100px;
+  width: 30%;
+}
+
+#kv2 {
+  position: absolute;
+  top: 15%;
+  left: 64%;
+  background-color: greenyellow;
+  height: 100px;
+  width: 30%;
+}
+
+#nesto
+{
+  background: url("http://static4.businessinsider.com/image/57910997dd0895a56e8b4604-1190-625/here-is-every-single-pokmon-currently-in-pokmon-go.jpg") no-repeat center center fixed;
+  width: 100%;
+  height: auto;
+  background-size: cover;
+
+
+}
+#op{
+  background: transparent;
+}
+* { margin: 0; padding: 0; }
+
+#bg{ background: url("http://static4.businessinsider.com/image/57910997dd0895a56e8b4604-1190-625/here-is-every-single-pokmon-currently-in-pokmon-go.jpg") no-repeat center center fixed;;
+  position: relative; top: 0; left: 0; }
+.bgwidth { width: 100%; }
+.bgheight { height: 100%; }
+
+#page-wrap { position: relative; width: 400px; margin: 50px auto; padding: 20px; background: white; -moz-box-shadow: 0 0 20px black; -webkit-box-shadow: 0 0 20px black; box-shadow: 0 0 20px black; }
+p { font: 15px/2 Georgia, Serif; margin: 0 0 30px 0; text-indent: 40px; }
+
+#nn
+{
+  margin-top: 3%;
+}
