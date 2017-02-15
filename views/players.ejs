@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%=title%></title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/players.css' />
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+<form action="/register" method="get">
+    <p><button type="submit" url="/register">Create</button></p>
+</form>
+
+
+
+    <table id="myTable" style="width:80%">
+
+    <tr>
+        <th>uname</th>
+        <th>First name</th>
+        <th>Last name</th>
+        <th>Edit</th>
+        <th>Delete</th>
+    </tr>
+
+
+    <% for (var i = 0; i <niz.length; i++){ %>
+    <tr >
+        <td id="uname" name="uname"><%= niz[i].uname %></td>
+        <td ><%= niz[i].firstname %></td>
+        <td><%= niz[i].lastname %></td>
+        <td>
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#<%=i%>" aria-expanded="false" aria-controls="#<%=i%>">
+                Edit
+            </button>
+
+
+        </td>
+        <td><button type="submit" onclick="brisi(<%= i %>)">Delete</button></td>
+
+        <td>
+        <div class="collapse" id="<%=i%>" aria-expanded="false">
+
+            Edit Igraca
+            <!--<table id="editTable<%=i%>">-->
+
+             <!--   <tr>
+                    <th>uname</th>
+                    <th>First name</th>
+                    <th>Last name</th>
+                </tr>
+                <tr id="unamenew" name="unamenew"><input type="text" id=<%="neki"+i%> name=<%="neki"+i%> placeholder="Unesi username"></tr>
+                <tr ><input type="text" id="namenew" name="namenew" placeholder="Unesi ime"></tr>
+                <tr><input type="text" id="lnamenew" name="lnamenew" placeholder="Unesi prezime"></tr>-->
+            <form  method="post" class="navbar-form navbar-right"  name="poc" role="form" >
+            <input type="text" id=<%="namenew"+i%> name=<%="namenew"+i%> placeholder="Unesi ime">
+            <input type="text" id=<%="lnamenew"+i%> name=<%="lnamenew"+i%> placeholder="Unesi prezime">
+            </form>
+            <!--</table>-->
+            <button type="submit" onclick="edit(<%= i %>)">Save</button>
+
+        </div>
+        </td>
+    </tr>
+
+
+    <% } %>
+
+
+
+</table>
+    <script type="text/javascript" src="/javascripts/players.js"></script>
+</body>
+</html>
