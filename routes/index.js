@@ -25,38 +25,18 @@ var config = {
 //this initializes a connection pool
 //it will keep idle connections open for a 30 seconds
 //and set a limit of maximum 10 idle clients
-var pool = new Pool(config);
+
 
 // to run a query we can acquire a client from the pool,
 // run a query on the client, and then return the client to the pool
-pool.connect(function(err, client, done) {
-    if(err) {
-        return console.error('error fetching client from pool', err);
-    }
-    client.query('SELECT $1::int AS number', ['1'], function(err, result) {
-        //call `done()` to release the client back to the pool
-        done();
 
-        if(err) {
-            return console.error('error running query', err);
-        }
-        console.log(result.rows[0].number);
-        //output: 1
-    });
-});
-
-pool.on('error', function (err, client) {
-    // if an error is encountered by a client while it sits idle in the pool
-    // the pool itself will emit an error event with both the error and
-    // the client which emitted the original error
-    // this is a rare occurrence but can happen if there is a network partition
-    // between your application and the database, the database restarts, etc.
-    // and so you might want to handle it and at least log it out
-    console.error('idle client error', err.message, err.stack)
-});
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+
+
+//can also call 'update(message)' and then 'finalize()'
+
   res.render('index', { title: 'Pokemon GO!' });
 });
 
@@ -78,6 +58,9 @@ router.get('/register', function(req, res, next) {
     res.render('register', { title: 'REGISTRACIJA!' });
 });
 
+router.get('/dodajvezu', function(req, res, next) {
+    res.render('dodajvezu', { title: 'REGISTRACIJA!' });
+});
 
 
 
@@ -87,19 +70,23 @@ router.get('/register', function(req, res, next) {
 
 router.get('/igraci', function(req, res, next) {
     var niz = [];
+    var pool = new Pool(config);
     pool.query('Select * from players', function(err, result) {
         for (var i = 0; i < result.rows.length; i++) {
             niz[i] = result.rows[i];
         }
+
         if(err) {
             return console.error('error running query', err);
         }
         res.render('players', {niz: niz, title: 'Igraci' });
     });
+
 });
 
 router.get('/pokemoni', function(req, res, next) {
     var niz = [];
+    var pool = new Pool(config);
     pool.query('Select * from pokemontypes', function(err, result) {
         for (var i = 0; i < result.rows.length; i++) {
             niz[i] = result.rows[i];
@@ -111,25 +98,57 @@ router.get('/pokemoni', function(req, res, next) {
     });
 });
 
-
-router.get('/ooo', function(req, res, next) {
-    var niz = [];
-    pool.query('Select * from playerpokemon', function(err, result) {
+router.get('/ooop', function(req, res, next) {
+    var nizz = [];
+    var pool = new Pool(config);
+    console.log(req.body.unamee);
+    pool.query('Select * from playerpokemon where uname=($1)',[req.body.unamee], function(err, result) {
         for (var i = 0; i < result.rows.length; i++) {
-            niz[i] = result.rows[i];
+            nizz[i] = result.rows[i];
         }
         if(err) {
             return console.error('error running query', err);
         }
+        res.render('veza', {niz: nizz, title: 'Pokemoni od igraca' });
+       /* res.send({
+            niz:nizz
+        })*/
+
+    });
+});
+
+
+router.get('/mojipok', function(req, res,next) {
+    var niz = [];
+    console.log("Cookies new:  ", req.cookies);
+    var pool = new Pool(config);
+    console.log(req.cookies.username);
+
+    pool.query('Select * from playerpokemon where uname=($1)',[req.cookies.username], function(err, result) {
+
+        for (var i = 0; i < result.rows.length; i++) {
+
+            niz[i] = result.rows[i];
+
+        }
+
+        if(err) {
+            return console.error('error running query', err);
+        }
+        //res.render('veza', {niz: niz, title: 'Spisak'});
+        //res.send(niz);
         res.render('veza', {niz: niz, title: 'Pokemoni' });
     });
 });
 
+
+
+
 router.post('/ovdje', function(req, res,next) {
     var niz = [];
-    //var iii = req.body.unme;
-    //console.log(iii);
-    pool.query('Select * from playerpokemon where uname=($1)',[req.body.unme], function(err, result) {
+    var pool = new Pool(config);
+
+    pool.query('Select * from playerpokemon where uname=($1)',[req.body.user], function(err, result) {
 
         for (var i = 0; i < result.rows.length; i++) {
 
@@ -142,13 +161,30 @@ router.post('/ovdje', function(req, res,next) {
         }
        //res.render('veza', {niz: niz, title: 'Spisak'});
         //res.send(niz);
-        res.redirect('veza', {niz: niz, title: 'Pokemoni' });
+        res.render('veza', {niz: niz, title: 'Pokemoni' });
     });
 });
 
 router.post('/dodajpl', function(req, res, next) {
     //res.send(reg.body);
-    pool.query('Insert into players (uname,firstname,lastname) values ($1,$2,$3)',[req.body.unm, req.body.fname,req.body.lname],function(err, result) {
+    var pool = new Pool(config);
+    var sha512 = require('sha512');
+    var ps=req.body.pas;
+
+    var nn=sha512(ps).toString('hex');
+    console.log(nn);
+    pool.query('Insert into players (uname,firstname,lastname,password) values ($1,$2,$3,$4)',[req.body.unm, req.body.fname,req.body.lname,nn],function(err, result) {
+        if(err) {
+            return console.error('error running query', err);
+        }
+        res.redirect('/igraci');
+    });
+});
+
+router.post('/dodajvezu', function(req, res, next) {
+    //res.send(reg.body);
+    var pool = new Pool(config);
+    pool.query('Insert into playerpokemon (uname,pokemonid) values ($1,$2)',[req.body.uname, req.body.pokid],function(err, result) {
         if(err) {
             return console.error('error running query', err);
         }
@@ -158,9 +194,12 @@ router.post('/dodajpl', function(req, res, next) {
 
 
 
+
 router.post('/brisipl', function(req, res, next) {
     //res.send(reg.body);
+    var pool = new Pool(config);
     pool.query('Delete from players where uname=($1)',[req.body.unme],function(err, result) {
+
         if(err) {
             return console.error('error running query', err);
         }
@@ -169,6 +208,7 @@ router.post('/brisipl', function(req, res, next) {
 });
 router.post('/brisipok', function(req, res, next) {
     //res.send(reg.body);
+    var pool = new Pool(config);
     pool.query('Delete from pokemontypes where pokemonid=($1)',[req.body.br],function(err, result) {
         if(err) {
             return console.error('error running query', err);
@@ -176,10 +216,11 @@ router.post('/brisipok', function(req, res, next) {
         res.redirect('/pokemoni');
     });
 });
-
-router.post('/updatepl', function(req, res, next) {
+router.post('/brisivezu', function(req, res, next) {
     //res.send(reg.body);
-    pool.query('UPDATE players set lastname=($1), firstname=($2) where uname=($3)',[req.body.lname,req.body.fname,req.body.unm],function(err, result) {
+    var pool = new Pool(config);
+    pool.query('Delete from playerpokemon where uname=($1) and pokemonid=($2)',[req.body.nick,req.body.pokid],function(err, result) {
+
         if(err) {
             return console.error('error running query', err);
         }
@@ -187,8 +228,40 @@ router.post('/updatepl', function(req, res, next) {
     });
 });
 
+
+router.post('/updatepl', function(req, res, next) {
+    //res.send(reg.body);
+    var pool = new Pool(config);
+    var sha512 = require('sha512');
+    var ps=req.body.pas;
+
+    var nn=sha512(ps).toString('hex');
+    console.log(nn);
+    pool.query('UPDATE players set lastname=($1), firstname=($2), password=($3), mail=($4) where uname=($5)',[req.body.lname,req.body.fname,nn,req.body.mail,req.body.unm],function(err, result) {
+        if(err) {
+            return console.error('error running query', err);
+        }
+        res.redirect('/igraci');
+    });
+});
+
+router.post('/updatevezu', function(req, res, next) {
+    //res.send(reg.body);
+    var pool = new Pool(config);
+    pool.query('UPDATE playerpokemon set customname=($1) where uname=($3) and pokemonid=($2)',[req.body.customnm,req.body.pokid,nn,req.body.nick],function(err, result) {
+        if(err) {
+            return console.error('error running query', err);
+        }
+        res.redirect('/igraci');
+    });
+});
+
+
+
+
 router.post('/updatepok', function(req, res, next) {
     //res.send(reg.body);
+    var pool = new Pool(config);
     pool.query('UPDATE pokemontypes set name=($1) where pokemonid=($2)',[req.body.newname,req.body.br],function(err, result) {
         if(err) {
             return console.error('error running query', err);
@@ -201,6 +274,7 @@ router.post('/updatepok', function(req, res, next) {
 
 router.post('/addpok', function(req, res, next) {
     //res.send(reg.body);
+    var pool = new Pool(config);
     pool.query('Insert into pokemontypes (name) values ($1)',[req.body.pokime],function(err, result) {
         if(err) {
             return console.error('error running query', err);
@@ -213,9 +287,10 @@ router.post('/addpok', function(req, res, next) {
   res.render('login', { title: 'Pokemoni' });
 });*/
 router.get('/ok', function(req, res, next) {
-    //console.log(res.cookie);
-    if ((req.cookies.kuki) && (req.cookies.kuki == "kuki_kuki_PMF"))
-        res.render('login');
+    //console.log(req.cookies.username);
+    console.log("Cookies :  ", req.cookies);
+       if ((req.cookies.kuki) && (req.cookies.kuki == "kuki_kuki_PMF"))
+        res.render('login',{title:req.body.mail,username:req.cookies.username});
     else {
         console.log("redirect na errror");
         res.redirect('/error');
@@ -229,8 +304,9 @@ router.get('/error', function(req, res, next) {
 
 
 });
-router.post('/login', function(req, res, next) {
+router.post('/loginstari', function(req, res, next) {
     console.log(req);
+
     if(req.body.mail == "Aldy" && req.body.password == "13aA"){
         console.log("set kuki");
 
@@ -240,6 +316,72 @@ router.post('/login', function(req, res, next) {
     else {
         res.redirect("/error");
     }
+});
+
+router.post('/login', function(req, res, next) {
+   // console.log(req);
+    var niz = [];
+    var pool = new Pool(config);
+
+    pool.query('Select password from players where uname=($1)',[req.body.mail], function(err, result) {
+
+        for (var i = 0; i < result.rows.length; i++) {
+
+            niz[i] = result.rows[i];
+
+        }
+
+        if(err) {
+            return console.error('error running query', err);
+        }
+        var sha512 = require('sha512');
+        var ps=req.body.password;
+
+
+        var nn=sha512(ps).toString('hex');
+
+
+        console.log("nn ");
+        console.log(nn);
+       // console.log("od ");
+       // console.log(niz[0].password);
+        if(result.rows.length==0)  res.redirect("/error");
+ else   if(nn==niz[0].password){
+            const crypto = require('crypto');
+            var privateKey = '37LvDSm4XvjYOh9Y';
+            const cipher = crypto.createCipher('aes192', privateKey);
+            var crypted = cipher.update(ps, 'utf8', 'hex');
+            crypted += cipher.final('hex');
+            console.log("cry ");
+            console.log(cipher);
+            console.log(crypted);
+            //res.json({ message: 'Welcome to the coolest API on earth!' });
+
+
+        console.log("set kuki");
+        res.cookie('username', req.body.mail,{expire : new Date() + 9999});
+        res.cookie('token', crypted);
+        res.cookie('kuki', 'kuki_kuki_PMF');
+        res.redirect('/ok');
+    }
+    else {
+        res.redirect("/error");
+    }
+    });
+
+
+});
+
+
+
+
+router.get('/hash',function (req,res,next) {
+    var sha512 = require('sha512');
+    var ps=req.body.pas;
+    var nn=sha512(ps).toString('hex');
+    console.log(nn);
+    res.send(nn);
+
 });
 
 router.get('/koord', function(req, res, next) {
@@ -295,11 +437,11 @@ router.get('/vrsta', function(req, res, next) {
   });
 
 });
-router.post('/login', function(req, res, next) {
-    console.log(req.body);
-    res.send({
-        status:"ok"
-    })
+router.post('/logout', function(req, res, next) {
+    var un=req.cookies.username;
+    clearCookie('username');
+    alert("Vidimo se opet "+un);
+    res.render('index', {title: 'Pokemon GO' });
 });
 
 router.post('/Sign', function(req, res, next) {

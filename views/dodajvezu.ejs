@@ -16,25 +16,40 @@
 
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-
-
-
-
-
-
 </head>
+<script>
+    function dodaj() {
+        var poknm=$("#name").val();
+        //var pokbr=$("#id").val();
+        /* var nick=document.getElementById('uname').value();
+         var ime=document.getElementById('frname').value();
+         var prez=document.getElementById('lsname').value();*/
+        //console.log(ime);
+        $.ajax({
+            method:"POST",
+            url: "/addpok",
+            data:{pokime:poknm},
+        }).done(function(){
+            //console.log(data),
 
+            //window.location.reload();
+            window.location.assign('/pokemoni');
+        }).fail(function() {
+            alert( "error" );
+
+        });
+    }
+</script>
 <body>
+<div class="container">
+    <form  method="post">
+        <p><input type="text" id="uname" name="uname" placeholder="Unesi username igraca"></p>
+        <p><input type="text" id="pokid" name="pokid" placeholder="Unesi id pokemona"></p>
 
+        <input type="button" value="Save" onclick="dodajvezu()">
+    </form>
+</div>
 
-<form action="/dodajvezu" method="get">
-    <p><button type="submit" url="/dodajvezu">Create</button></p>
-</form>
-  <form action="/ovdje" method="post">
-      <input type="text" id="user" name="user" placeholder="Unesi korisnicko ime">
-     <input type="submit" value="Potvrdi">
-  </form>
-
-<script type="text/javascript" src="/javascripts/players.js"></script>
+<script type="text/javascript" src="/javascripts/veza.js"></script>
 </body>
 </html>

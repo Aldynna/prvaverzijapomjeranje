@@ -27,12 +27,18 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="#" onload="nes()" id="demo">POKEMON GO!</a>
+
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="active" id="ovdje"><a href="#"></a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
+
+                <li><a href="#contact" style="color: red" "><%=username%></a></li>
+                <li><a href="/mojipok"   target="popup"
+                       onclick="window.open('/mojipok','popup','width=600,height=600'); return false;">About</a></li>
+
+
+
+                <li><a href="#contact" >Contact</a></li>
             </ul>
         </div><!--/.nav-collapse -->
     </div>
@@ -170,10 +176,18 @@
     }
 
     function pomjeraj() {
+        bounds = map.getBounds();
+        southWest = bounds.getSouthWest();
+        northEast = bounds.getNorthEast();
+        lngSpan = northEast.lng() - southWest.lng();
+        latSpan = northEast.lat() - southWest.lat();
+
+
         $.ajax({
-            method: "GET",
+            method: "get",
             url: "/koord",
-            data: { username: "Aldy", password: "Bos" }
+//,sw:southWest,ne:northEast,lgs:lngSpan,lts:latSpan
+            data: { username: "Aldy", password: "Bos"}
         })
                 .done(function( msg ) {
 
@@ -266,6 +280,7 @@
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
+<script type="text/javascript" src="/javascripts/login.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
 <script src="../../dist/js/bootstrap.min.js"></script>
